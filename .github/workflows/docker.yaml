@@ -164,12 +164,6 @@ jobs:
         # 安装必要的工具（可选，视运行器镜像而定）
         # sudo apt-get update && sudo apt-get install -y curl jq coreutils
 
-        # 获取当前时间戳
-        TIMESTAMP=$(date -u +%s)
-
-        # 生成签名
-        SIGN=$(printf '%s\n%s' "${TIMESTAMP}" "${DINGTALK_SECRET}" | openssl dgst -sha256 -hmac "${DINGTALK_SECRET}" -binary | base64)
-
         # 构建消息
         MESSAGE=$(cat <<EOF
         GitHub Actions 任务已完成。
@@ -193,6 +187,6 @@ jobs:
           }')
 
         # 发送请求
-        curl "https://oapi.dingtalk.com/robot/send?access_token=${DINGTALK_WEBHOOK}&timestamp=${TIMESTAMP}&sign=${SIGN}" \
+        curl "https://oapi.dingtalk.com/robot/send?access_token=${DINGTALK_WEBHOOK}" \
           -H 'Content-Type: application/json' \
           --data-binary "$PAYLOAD"
