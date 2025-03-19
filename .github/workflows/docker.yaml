@@ -169,8 +169,9 @@ jobs:
         GitHub Actions 任务已完成。
 
         - ​**仓库**: ${{ github.repository }}
-        - ​**事件**: ${{ github.event_name }}
+        - ​**事件**: 镜像转换
         - ​**状态**: ${{ job.status }}
+        - ​**结果**: docker pull registry.cn-hangzhou.aliyuncs.com/dooit/xxx:xxx
         - ​**详情**: [查看详情](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
         EOF
         )
