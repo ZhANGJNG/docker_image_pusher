@@ -161,25 +161,38 @@ jobs:
         DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
         DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
       run: |
-        # 安装必要的工具
-        sudo apt-get update && sudo apt-get install -y curl jq coreutils
+        # 安装必要的工具（可选，视运行器镜像而定）
+        # sudo apt-get update && sudo apt-get install -y curl jq coreutils
 
         # 获取当前时间戳
         TIMESTAMP=$(date -u +%s)
 
         # 生成签名
-        SIGN=$(echo -n "${TIMESTAMP}\n${DINGTALK_SECRET}" | openssl dgst -sha256 -hmac $(echo -n "${DINGTALK_SECRET}" | tr -d '\n') -binary | base64)
+        SIGN=$(printf '%s\n%s' "${TIMESTAMP}" "${DINGTALK_SECRET}" | openssl dgst -sha256 -hmac "${DINGTALK_SECRET}" -binary | base64)
 
-        # 构建消息（同上）
-        MESSAGE="GitHub Actions 任务已完成。\n\n- ​**仓库**: ${{ github.repository }}\n- ​**事件**: ${{ github.event_name }}\n- ​**状态**: ${{ job.status }}\n- ​**详情**: [查看详情](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        # 构建消息
+        MESSAGE=$(cat <<EOF
+        GitHub Actions 任务已完成。
+
+        - ​**仓库**: ${{ github.repository }}
+        - ​**事件**: ${{ github.event_name }}
+        - ​**状态**: ${{ job.status }}
+        - ​**详情**: [查看详情](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        EOF
+        )
+
+        # 使用 jq 构建 JSON Payload
+        PAYLOAD=$(jq -n \
+          --arg msg "$MESSAGE" \
+          '{
+            msgtype: "markdown",
+            markdown: {
+              title: "GitHub Actions 通知",
+              text: $msg
+            }
+          }')
 
         # 发送请求
-        curl $'https://oapi.dingtalk.com/robot/send?access_token='${DINGTALK_WEBHOOK}'&timestamp='${TIMESTAMP}'&sign='${SIGN} \
+        curl "https://oapi.dingtalk.com/robot/send?access_token=${DINGTALK_WEBHOOK}&timestamp=${TIMESTAMP}&sign=${SIGN}" \
           -H 'Content-Type: application/json' \
-          -d '{
-            "msgtype": "markdown",
-            "markdown": {
-              "title":"GitHub Actions 通知",
-              "text":"'${MESSAGE//\'/\'\\\'\'}"
-            }
-          }'
+          --data-binary "$PAYLOAD"
