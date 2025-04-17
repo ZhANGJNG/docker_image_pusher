@@ -1,4 +1,4 @@
---platform=linux/arm64 ascendai/cann:8.0.rc1-310p-ubuntu22.04-py3.9
+nvidia/cuda:12.2.2-base-ubuntu22.04
 #支持私库
 #k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.0.0
 #xhofe/alist:latest
