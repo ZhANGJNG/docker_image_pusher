@@ -1,7 +1,4 @@
-quay.io/jetstack/cert-manager-cainjector:v1.17.2
-quay.io/jetstack/cert-manager-controller:v1.17.2
-quay.io/jetstack/cert-manager-webhook:v1.17.2
-quay.io/jetstack/cert-manager-startupapicheck:v1.17.2
+docker-0.unsee.tech/xprobe/xinference:nightly-main
 #支持私库
 #k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.0.0
 #xhofe/alist:latest
